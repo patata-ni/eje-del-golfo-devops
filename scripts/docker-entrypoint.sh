@@ -1,5 +1,8 @@
 #!/bin/sh
 set -eu
+# El alojamiento debe cargar un solo MPM, compatible con mod_php.
+a2dismod mpm_event mpm_worker
+a2enmod mpm_prefork
 port="${PORT:-8080}"
 sed -i "s/Listen 80/Listen ${port}/" /etc/apache2/ports.conf
 sed -i "s/:80>/:${port}>/" /etc/apache2/sites-available/000-default.conf

@@ -8,9 +8,14 @@ use App\Models\Route;
 
 class SearchController extends Controller
 {
-    public function results()
+    public function results(Request $request)
     {
-        return redirect()->route('rutas');
+        $request->validate([
+            'origen' => ['nullable', 'string', 'max:150'],
+            'destino' => ['nullable', 'string', 'max:150'],
+        ]);
+
+        return redirect()->route('rutas', $request->only(['origen', 'destino']));
     }
 
     public function routes(Request $request)

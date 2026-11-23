@@ -53,6 +53,7 @@ class TransportWorkflowTest extends TestCase
         $schedule = Schedule::create(['ruta_id' => $route->id_ruta, 'hora_salida' => '09:00:00', 'estado' => 'activo']);
         $departure = Departure::create(['horario_id' => $schedule->id_horario, 'fecha' => today(), 'estado' => 'programada']);
         $this->actingAs(User::factory()->create(['role_id' => 3]));
+        $this->get('/resultados?origen=Poza&destino=Papantla')->assertRedirect('/rutas?origen=Poza&destino=Papantla');
         $this->get('/rutas?origen=Poza&destino=Papantla')->assertOk()->assertViewHas('corridas', fn ($rows) => $rows->count() === 1);
         $this->get('/rutas?destino=Inexistente')->assertOk()->assertViewHas('corridas', fn ($rows) => $rows->isEmpty());
         $this->get('/reservar/'.$departure->id_salida)->assertOk()->assertJsonPath('destino', 'Papantla');

@@ -26,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-24.04, windows-latest]
     env:
       APP_ENV: testing
       APP_DEBUG: 'false'
@@ -91,7 +91,7 @@ jobs:
   build:
     name: Construir y comprobar artefacto MySQL
     needs: validate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: write
@@ -170,7 +170,7 @@ jobs:
     name: Entregar y validar pruebas en Railway
     needs: build
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: pruebas
       url: https://eje-web-pruebas.up.railway.app
@@ -213,7 +213,7 @@ jobs:
   deploy-preproduction:
     name: Promover mismo artefacto y validar preproducción
     needs: [build, deploy-testing]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: preproduccion
       url: https://eje-web-preproduccion.up.railway.app

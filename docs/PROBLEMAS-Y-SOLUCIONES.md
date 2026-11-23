@@ -17,3 +17,7 @@
 Las incidencias posteriores del pipeline se incorporan al informe final con enlaces y resultados reales.
 
 La primera ejecución remota detectó que el ejecutor Windows no habilitaba `fileinfo`, extensión requerida por Flysystem. Se añadió expresamente a la preparación de PHP, junto con las demás extensiones necesarias. No se ignoró el requisito de Composer: la instalación debe funcionar con los requisitos reales.
+
+El ejecutor Linux de ubuntu-latest inició descargas muy lentas de dependencias del sistema. Se fijó Ubuntu 24.04 para reproducir la preparación con una versión conocida. La ejecución intermedia se detuvo antes de desplegar para validar la revisión corregida.
+
+La búsqueda desde inicio redirigía a rutas perdiendo origen y destino. Se conservan ahora ambos filtros y se comprueba la redirección. El acceso con Google se presenta sólo cuando están configuradas sus credenciales; el ingreso por correo permanece disponible.

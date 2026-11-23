@@ -5,7 +5,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   workers: 2,
   reporter: [['list'], ['html', { open: 'never' }], ['junit', { outputFile: 'test-results/browser.xml' }]],
-  use: { baseURL: process.env.BASE_URL || 'http://127.0.0.1:8085', screenshot: 'on', trace: 'retain-on-failure' },
+  use: { baseURL: process.env.BASE_URL || 'http://127.0.0.1:8085', screenshot: 'on', trace: 'off' },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'firefox', use: { ...devices['Desktop Firefox'] } },

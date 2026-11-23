@@ -16,6 +16,8 @@
 
 Las incidencias posteriores del pipeline se incorporan al informe final con enlaces y resultados reales.
 
+La ejecución 4 validó Windows, Linux y la imagen con MySQL, pero el comando `railway environment edit` terminó sin aplicar el cambio en el ejecutor sin terminal. La comprobación posterior detectó HTTP 404 y bloqueó la promoción. Se sustituyó ese paso por `scripts/deploy-railway.mjs`, que solicita explícitamente actualizar la imagen e iniciar el despliegue mediante la API oficial de Railway, usando el token limitado del ambiente. La verificación de versión sigue siendo obligatoria.
+
 La primera ejecución remota detectó que el ejecutor Windows no habilitaba `fileinfo`, extensión requerida por Flysystem. Se añadió expresamente a la preparación de PHP, junto con las demás extensiones necesarias. No se ignoró el requisito de Composer: la instalación debe funcionar con los requisitos reales.
 
 El ejecutor Linux de ubuntu-latest inició descargas muy lentas de dependencias del sistema. Se fijó Ubuntu 24.04 para reproducir la preparación con una versión conocida. La ejecución intermedia se detuvo antes de desplegar para validar la revisión corregida.

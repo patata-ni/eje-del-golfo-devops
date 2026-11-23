@@ -192,11 +192,11 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
-      - run: npm install --global @railway/cli@5.75.0
       - name: Desplegar digest validado
         env:
           IMAGE_REF: ${{ needs.build.outputs.image }}
-        run: railway environment edit --project 4236ca6a-af30-4e1c-bbe5-34eadb68f375 --environment 4af223b3-3dc6-47e9-8142-b747b0a0b6b4 --service-config c4d557eb-636d-4c59-936b-2f7f0072b0e2 source.image "$IMAGE_REF" --service-config c4d557eb-636d-4c59-936b-2f7f0072b0e2 deploy.healthcheckPath /version --message "Entrega validada desde GitHub Actions"
+          RAILWAY_ENVIRONMENT_ID: 4af223b3-3dc6-47e9-8142-b747b0a0b6b4
+        run: node scripts/deploy-railway.mjs
       - run: node scripts/wait-deployment.mjs
       - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run test:e2e
@@ -235,11 +235,11 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
-      - run: npm install --global @railway/cli@5.75.0
       - name: Promover el mismo digest sin reconstruir
         env:
           IMAGE_REF: ${{ needs.build.outputs.image }}
-        run: railway environment edit --project 4236ca6a-af30-4e1c-bbe5-34eadb68f375 --environment c0f831f3-e576-4dcb-a9e0-ffa72f0645b7 --service-config c4d557eb-636d-4c59-936b-2f7f0072b0e2 source.image "$IMAGE_REF" --service-config c4d557eb-636d-4c59-936b-2f7f0072b0e2 deploy.healthcheckPath /version --message "Promoción del artefacto probado"
+          RAILWAY_ENVIRONMENT_ID: c0f831f3-e576-4dcb-a9e0-ffa72f0645b7
+        run: node scripts/deploy-railway.mjs
       - run: node scripts/wait-deployment.mjs
       - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run test:e2e

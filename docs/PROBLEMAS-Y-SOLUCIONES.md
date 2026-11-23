@@ -15,3 +15,5 @@
 | La sesión de Railway CLI permite desplegar, pero rechazó crear tokens de proyecto | Se requiere configurar tokens limitados a cada ambiente desde la cuenta Railway para la automatización. |
 
 Las incidencias posteriores del pipeline se incorporan al informe final con enlaces y resultados reales.
+
+La primera ejecución remota detectó que el ejecutor Windows no habilitaba `fileinfo`, extensión requerida por Flysystem. Se añadió expresamente a la preparación de PHP, junto con las demás extensiones necesarias. No se ignoró el requisito de Composer: la instalación debe funcionar con los requisitos reales.

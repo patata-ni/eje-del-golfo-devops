@@ -83,29 +83,34 @@ class MobileController extends Controller
             ->orderBy('fecha')->orderBy('id_salida');
     }
 
-    private function usable(Departure $departure): bool
+    private function usable(Departure $departure, ?array $blockedUnits = null): bool
     {
         return $departure->estado === 'programada'
             && $departure->schedule?->estado === 'activo'
             && $departure->schedule?->route?->estado === 'activa'
             && $departure->unit?->estado === 'disponible'
             && $departure->driver?->estado === 'disponible'
-            && ! DB::table('incidencias')->where('unidad_id', $departure->unidad_id)->whereNotIn('estado', ['cerrada', 'atendida'])->exists()
-            && ! DB::table('mantenimientos')->where('unidad_id', $departure->unidad_id)->whereIn('estado', ['pendiente', 'en_proceso'])->exists();
+            && ($blockedUnits !== null
+                ? ! in_array($departure->unidad_id, $blockedUnits)
+                : (! DB::table('incidencias')->where('unidad_id', $departure->unidad_id)->whereNotIn('estado', ['cerrada', 'atendida'])->exists()
+                    && ! DB::table('mantenimientos')->where('unidad_id', $departure->unidad_id)->whereIn('estado', ['pendiente', 'en_proceso'])->exists()));
     }
 
     public function catalog()
     {
-        $routes = Route::where('estado', 'activa')->orderBy('id_ruta')->get()->map(function ($route) {
-            $stops = DB::table('ruta_parada')->join('paradas', 'parada_id', '=', 'id_parada')
-                ->where('ruta_id', $route->id_ruta)->orderBy('orden')->pluck('nombre')->all();
+        $stopsByRoute = DB::table('ruta_parada')->join('paradas', 'parada_id', '=', 'id_parada')
+            ->orderBy('orden')->get(['ruta_id', 'nombre'])->groupBy('ruta_id');
+        $routes = Route::where('estado', 'activa')->orderBy('id_ruta')->get()->map(function ($route) use ($stopsByRoute) {
+            $stops = $stopsByRoute->get($route->id_ruta, collect())->pluck('nombre')->all();
 
             return ['id' => (string) $route->id_ruta, 'origin' => $route->origen, 'destination' => $route->destino,
                 'minutes' => (string) ($route->duracion_minutos ?? ''), 'distance' => '', 'type' => 'General',
                 'price' => (string) $route->precio, 'status' => 'Activa',
                 'stops' => implode("\n", array_unique([$route->origen, ...$stops, $route->destino]))];
         });
-        $departures = $this->departures()->get()->filter(fn ($d) => $this->usable($d));
+        $blockedUnits = DB::table('incidencias')->whereNotIn('estado', ['cerrada', 'atendida'])->pluck('unidad_id')
+            ->merge(DB::table('mantenimientos')->whereIn('estado', ['pendiente', 'en_proceso'])->pluck('unidad_id'))->unique()->all();
+        $departures = $this->departures()->get()->filter(fn ($d) => $this->usable($d, $blockedUnits));
         $services = $departures->map(fn ($d) => ['id' => (string) $d->id_salida, 'route' => (string) $d->schedule->ruta_id,
             'unit' => (string) $d->unidad_id, 'driver' => (string) $d->chofer_id, 'date' => $d->fecha,
             'time' => substr($d->schedule->hora_salida, 0, 5), 'capacity' => (string) $d->unit->capacidad, 'status' => 'Programada'])->values();

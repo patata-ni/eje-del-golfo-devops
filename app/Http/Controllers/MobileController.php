@@ -57,7 +57,7 @@ class MobileController extends Controller
         $user = User::where('email', Str::lower(trim($values['email'])))->first();
         // Run the same expensive check for unknown emails to avoid a timing shortcut.
         $valid = Hash::check($values['password'], $user?->password ?? '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.');
-        if (! $user || ! $valid || (int) $user->role_id !== 3) {
+        if (! $user || ! $user->password || ! $valid || (int) $user->role_id !== 3) {
             throw ValidationException::withMessages(['email' => 'Revisa tu correo y contraseña de pasajero.']);
         }
 
